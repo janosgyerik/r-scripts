@@ -37,6 +37,9 @@ main = function(filename) {
     # convert $time to *time* class data and rename column to $t
     df1 <- data.frame(t=as.POSIXlt(time, format='%d/%m/%Y %H:%M:%S'), ip, req)
 
+    # define the time range based on the full dataset, excluding NA values
+    timerange <- range_by_t(df1)
+
     # build per-ip frequencies table
     # the result has 2 columns: ip address and its number of occurrances
     freq <- data.frame(table(df1$ip))
@@ -54,21 +57,30 @@ main = function(filename) {
     # select only the rows with the given ip
     sub1 <- subset(df1, ip==pivot_ip, select=c(t, ip))
 
+    plot_by_t(sub1, title=pivot_ip, timerange=timerange)
+}
+
+range_by_t = function(data) {
+    range(data$t, na.rm=T)
+}
+
+plot_by_t = function(data, title=NULL, timerange=NULL) {
     # build per-minute frequencies table using truncated times
-    df2 <- data.frame(table(data.frame(trunc(sub1$t, 'mins'))))
-    colnames(df2) <- c('t', 'freq')
+    df1 <- data.frame(table(data.frame(trunc(data$t, 'mins'))))
+    colnames(df1) <- c('t', 'freq')
 
     # convert the type of $t back to time
-    df2 <- data.frame(t=as.POSIXlt(df2$t), freq=df2$freq)
+    df1 <- data.frame(t=as.POSIXlt(df1$t), freq=df1$freq)
 
-    # define the time range based on the full dataset, excluding NA values
-    timerange <- range(df1$t, na.rm=T)
+    if (is.null(timerange)) {
+        timerange <- range_by_t(df1)
+    }
 
     # begin plot generation
     png(filename=sprintf('%s.png', filename), width=800, height=400, units='px')
-    plot(df2$t, df2$freq, type='h',
+    plot(df1$t, df1$freq, type='h',
         # main title and axis labels
-        main=pivot_ip, xlab='Time', ylab='# of requests per minute',
+        main=title, xlab='Time', ylab='# of requests per minute',
         # enforce x-axis range regardless of the dataset
         xlim=timerange,
         xaxt='n', yaxt='n', font.axis=6, col='blue')
