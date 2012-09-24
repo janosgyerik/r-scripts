@@ -9,7 +9,7 @@
 # - process csv files specified on the command line
 # - load csv data into a data.frame
 # - convert textual time data to time type
-# - find the most frequent ip address
+# - loop over the most frequent 3 ip addresses
 # - plot the number of requests per minute from the selected ip
 #
 # Other demonstrated features:
@@ -20,6 +20,7 @@
 # - exclude NA values from a dataset
 # - extract a subset of a data.frame based on some conditions
 # - rename data.frame columns
+# - string formatting using *sprintf*
 # - advanced plotting with custom parameters: 
 #   - custom title and axis labels
 #   - time-based axis
@@ -50,21 +51,21 @@ main = function(filename) {
     # reorder: descending order by frequency -> freq[1] = highest freq data!
     freq <- freq[with(freq, order(-freq)),]
 
-    # get the highest frequency ip address
-    pivot_ip <- freq$ip[1]
-    pivot_ip <- freq$ip[2]  # 2nd highest frequency ip address
-
-    # select only the rows with the given ip
-    sub1 <- subset(df1, ip==pivot_ip, select=c(t, ip))
-
-    plot_by_t(sub1, title=pivot_ip, timerange=timerange)
+    i <- 1
+    for (pivot_ip in head(freq$ip, n=3)) {
+        out <- sprintf('%s-ip%02d.png', filename, i)
+        cat(sprintf('* plotting %s to %s ...\n', pivot_ip, out))
+        i <- i + 1
+        sub1 <- subset(df1, ip==pivot_ip, select=c(t, ip))
+        plot_by_t(sub1, out, title=pivot_ip, timerange=timerange)
+    }
 }
 
 range_by_t = function(data) {
     range(data$t, na.rm=T)
 }
 
-plot_by_t = function(data, title=NULL, timerange=NULL) {
+plot_by_t = function(data, filename, title=NULL, timerange=NULL) {
     # build per-minute frequencies table using truncated times
     df1 <- data.frame(table(data.frame(trunc(data$t, 'mins'))))
     colnames(df1) <- c('t', 'freq')
@@ -77,7 +78,7 @@ plot_by_t = function(data, title=NULL, timerange=NULL) {
     }
 
     # begin plot generation
-    png(filename=sprintf('%s.png', filename), width=800, height=400, units='px')
+    png(filename, width=800, height=400, units='px')
     plot(df1$t, df1$freq, type='h',
         # main title and axis labels
         main=title, xlab='Time', ylab='# of requests per minute',
