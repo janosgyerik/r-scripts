@@ -1,4 +1,7 @@
 #!/usr/bin/env Rscript
+#
+# Demonstrate how to loop over command line arguments of an R script.
+#
 
 args <- commandArgs(trailingOnly=T)
 

@@ -1,4 +1,30 @@
 #!/usr/bin/env Rscript
+#
+# A sample script for processing server logs in csv format with columns:
+# - time: the time of a client request
+# - ip: the ip address of the client
+# - req: the request destination, such as a service name or page name
+#
+# Overview:
+# - process csv files specified on the command line
+# - load csv data into a data.frame
+# - convert textual time data to time type
+# - find the most frequent ip address
+# - plot the number of requests per minute from the selected ip
+#
+# Other demonstrated features:
+# - *attach* to a data.frame for easier access of columns
+# - count unique values of a column
+# - reorder a data.frame
+# - convert textual time data to time type
+# - exclude NA values from a dataset
+# - extract a subset of a data.frame based on some conditions
+# - rename data.frame columns
+# - advanced plotting with custom parameters: 
+#   - custom title and axis labels
+#   - time-based axis
+#   - override default axis range
+#
 
 main = function(filename) {
     # read csv file, columns separated by ';'
