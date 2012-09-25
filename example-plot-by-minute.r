@@ -25,6 +25,7 @@
 #   - custom title and axis labels
 #   - time-based axis
 #   - override default axis range
+# - truncate time, cutting off seconds
 #
 
 main = function(filename) {
