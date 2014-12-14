@@ -1,1 +1,6 @@
+# RStudio
+*.Rproj
+.Rproj.user
+
+# misc
 tmp/
